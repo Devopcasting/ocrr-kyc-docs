@@ -1,5 +1,7 @@
 import pytesseract
 from pancard.identify_pancard import IdentifyPanCard
+from aadhaarcard.identify_aadhaarcard import IdentifyAadhaarCard
+from passport.identify_passport_doc import IdentifyPassPort
 from helper.clean_text import CleanText
 
 class DocumentTypeIdentification:
@@ -18,8 +20,34 @@ class DocumentTypeIdentification:
         # Pancard identification object
         self.pancard_obj = IdentifyPanCard(clean_text)
 
+        # Aadhaarcard identification object
+        self.aadhaarcard_obj = IdentifyAadhaarCard(clean_text)
+
+        # Passport identification object
+        self.passport_obj = IdentifyPassPort(clean_text)
+
     
     def identify_pancard(self) -> bool:
         if self.pancard_obj.check_pan_card():
+            return True
+        return False
+
+    def identify_aadhaarcard(self):
+        if self.aadhaarcard_obj.check_aadhaar_card():
+            return True
+        return False
+    
+    def identify_eaadhaarcard(self):
+        if self.aadhaarcard_obj.check_e_aadhaar_card():
+            return True
+        return False
+    
+    def identify_aadhaarcard_front(self):
+        if self.aadhaarcard_obj.check_aadhaar_front():
+            return True
+        return False
+    
+    def identify_passport(self):
+        if self.passport_obj.check_passport():
             return True
         return False
