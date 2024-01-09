@@ -33,11 +33,13 @@ class FilterInProgressDocuments:
                 for i in range(len(document_path_list)):
                     if len(document_path_list[i]) !=0:
                         document_sub_path += '\\'+document_path_list[i]
+
                 document_path = self.upload_path+document_sub_path
                 status = document['status']
                 clientid = document['clientId']
                 taskid = document['taskId']
                 uploaddir = document['uploadDir']
+
                 """Insert document info. into ocrrworkspace"""
                 self.insert_inprogress_document_info(taskid, document_path, status, clientid, uploaddir)
                 document_path = ""
