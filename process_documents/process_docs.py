@@ -23,8 +23,10 @@ class ProcessDocuments:
             document_path = self.inprogress_queue.get()
             if document_path is not None:
                 get_doc_format = self.identify_document_format(document_path)
+
                 if get_doc_format == "JPEG":
                     print("CALLING JPEG")
+
                 elif get_doc_format == "PDF":
                     """
                         PDF info that need to be passed
@@ -36,7 +38,8 @@ class ProcessDocuments:
                     document_name_prefix = self.get_prefix_name(document_path)
                     document_name = os.path.splitext(os.path.basename(document_path))[0]
                     frame_count = self.count_pdf_frames(document_path)
-
+                    document_info_list = []
+                    
                     """Convert PDF to JPEG"""
                     # Open PDF File
                     pdf_document = fitz.open(document_path)
@@ -66,13 +69,14 @@ class ProcessDocuments:
                             "documentPath": jpeg_path,
                             "uploadPath": self.upload_path,
                             "frameCount": frame_count,
-                            "redactedPath": document_path,
-                            "rejectedPath": self.upload_path+"\\"+document_name_prefix.split('+')[0]+"\\"+document_name_prefix.split('+')[1]+"\\"+"Rejected"
+                            "rejectedPath": self.upload_path+"\\"+document_name_prefix.split('+')[0]+"\\"+document_name_prefix.split('+')[1]+"\\"+"Rejected",
+                            "redactedPath": self.upload_path+"\\"+document_name_prefix.split('+')[0]+"\\"+document_name_prefix.split('+')[1]+"\\"+"Redacted"
                         }
-                        document_ocrr_obj = PerformOCRROnDocument(document_info)
-                        print(document_ocrr_obj.ocrr_docs())
-                        
+                        document_info_list.append(document_info)  
                     pdf_document.close()
+
+                    """Perform OCRR"""
+                    perform_ocrr = PerformOCRROnDocument(document_info_list).ocrr_docs()
 
             sleep(5)
     
