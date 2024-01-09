@@ -4,14 +4,19 @@ import queue
 import sys
 from config.database import MongoDBConnection
 from in_progress.filter_in_progress import FilterInProgressDocuments
+from process_documents.process_docs import ProcessDocuments
 from ocrr_log_mgmt.ocrr_log import OCRREngineLogging
 
 
 class OCRREngine:
     def __init__(self) -> None:
+
         """Logger"""
         logger_config = OCRREngineLogging()
         self.logger = logger_config.configure_logger()
+
+        """Starting OCRR Engine"""
+        self.logger.info("Starting OCRR Engine")
 
         """Establish OCRR Workspace DB connection"""
         database_name = "ocrrworkspace"
@@ -25,18 +30,31 @@ class OCRREngine:
                 self.logger.info(f"Creating {database_name} database and {collection_name} collection")
                 database = db_client[database_name]
                 database.create_collection(collection_name)
-                db_client.close()
             else:
                 self.logger.info(f"Flush {collection_name} collection")
                 database = db_client[database_name]
                 collection = database[collection_name]
-                collection.drop()
-                db_client.close()    
+                collection.drop()  
         else:
             self.logger.error("Failed to establish connection to MongoDB.")
             self.logger.info("Stopping OCRR Engine")
             db_client.close()
             sys.exit(1)
+
+        """Rest IN_QUEUE to IN_PROGRESS status"""
+        db_upload = db_client["upload"]
+        collection_filedetails = db_upload["fileDetails"]
+        collection_filedetails.update_many(
+            {
+                "status": "IN_QUEUE"
+            },
+            {
+                "$set": {
+                    "status": "IN_PROGRESS"
+                }
+            }
+        )
+        db_client.close()
 
         """"Set Queue objects"""
         self.in_progress_queue = queue.Queue()
@@ -50,8 +68,13 @@ class OCRREngine:
         query_inprogress_obj = FilterInProgressDocuments(upload_path, self.in_progress_queue)
         query_inprogress_thread = threading.Thread(target=query_inprogress_obj.query_in_progress_status)
         
+        """Thread 2: Process the documents"""
+        process_documents = ProcessDocuments(self.in_progress_queue, upload_path, workspace_path)
+        process_document_thread = threading.Thread(target=process_documents.process_docs)
+
         """Start Thread"""
         query_inprogress_thread.start()
+        process_document_thread.start()
         query_inprogress_thread.join()
 
 if __name__ == '__main__':
