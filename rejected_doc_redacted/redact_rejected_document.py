@@ -19,4 +19,3 @@ class RedactRejectedDocument:
         coordinates_list = []
         coordinates_list.append([x1, y1, x2, y2])
         return coordinates_list
-       
