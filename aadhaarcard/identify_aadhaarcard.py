@@ -25,7 +25,6 @@ class IdentifyAadhaarCard:
     
     # func: check for e-aadhaar card
     def check_e_aadhaar_card(self):
-        print(self.clean_text)
         for i in self.clean_text:
             for k in i.split():
                 if k.lower() in self.eaadhaar_card_identifiers:
