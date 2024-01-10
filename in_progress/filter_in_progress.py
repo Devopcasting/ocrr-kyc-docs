@@ -62,7 +62,7 @@ class FilterInProgressDocuments:
                 "uploadDir": uploaddir
             }
             self.collection_ocrr.insert_one(document_info)
-            self.in_progress_queue.put(document_path)
+            self.in_progress_queue.put(document_info)
             self.update_inprogress_status(taskid)
 
     def check_existing_taskid(self, taskid: str) -> bool:
