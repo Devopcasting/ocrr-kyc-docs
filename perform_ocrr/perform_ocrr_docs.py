@@ -249,6 +249,6 @@ class PerformOCRROnDocument:
         if client_doc:
             WEBHOOK_URL = client_doc["url"]
             HEADER = {'Content-Type': 'application/json'}
-            #requests.post(WEBHOOK_URL+"/CVCore/processstatus", data=json.dumps(payload), headers=HEADER)
+            requests.post(WEBHOOK_URL+"/CVCore/processstatus", data=json.dumps(payload), headers=HEADER)
         else:
             print("ERROR")
