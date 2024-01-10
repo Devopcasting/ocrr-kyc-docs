@@ -20,9 +20,9 @@ class ProcessDocuments:
     def process_docs(self):
         """Identify the document format (JPEG or PDF)"""
         while True:
-            document_path = self.inprogress_queue.get()
-            if document_path is not None:
-                get_doc_format = self.identify_document_format(document_path)
+            document_info = self.inprogress_queue.get()
+            if document_info is not None:
+                get_doc_format = self.identify_document_format(document_info['path'])
 
                 if get_doc_format == "JPEG":
                     print("CALLING JPEG")
@@ -34,15 +34,15 @@ class ProcessDocuments:
                         - Number of Frames
                         - Workspace path for PDF
                     """
-                    self.logger.info(f"PDF document found '{document_path}")
-                    document_name_prefix = self.get_prefix_name(document_path)
-                    document_name = os.path.splitext(os.path.basename(document_path))[0]
-                    frame_count = self.count_pdf_frames(document_path)
+                    self.logger.info(f"PDF document found '{document_info['path']}")
+                    document_name_prefix = self.get_prefix_name(document_info['path'])
+                    document_name = os.path.splitext(os.path.basename(document_info['path']))[0]
+                    frame_count = self.count_pdf_frames(document_info['path'])
                     document_info_list = []
                     
                     """Convert PDF to JPEG"""
                     # Open PDF File
-                    pdf_document = fitz.open(document_path)
+                    pdf_document = fitz.open(document_info['path'])
                     # Iterate through each page in the PDF
                     for page_number in range(frame_count):
                         # Get the page
@@ -62,6 +62,7 @@ class ProcessDocuments:
 
                         """Perform OCR-Redaction and Prepare Coordinates XML file"""
                         document_info = {
+                            "taskId": document_info['taskId'],
                             "documentType": "PDF",
                             "roomName": document_name_prefix.split('+')[0],
                             "roomID": document_name_prefix.split('+')[1],
