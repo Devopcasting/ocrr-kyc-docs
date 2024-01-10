@@ -67,7 +67,18 @@ class PerformOCRROnDocument:
             """Update upload db"""
             self.update_upload_filedetails(taskid, "REDACTED", pancard_result['message'])
         else:
-            pass
+            """Check the status"""
+            if status == "REJECTED":
+                # Get 75% redacted coordinates of the rejected document
+                rejected_doc_coordinates = RedactRejectedDocument(document_path).rejected()
+                WriteXML(rejectedPath, documentName , rejected_doc_coordinates).writexml()
+                """Update upload db"""
+                self.update_upload_filedetails(taskid, "REJECTED", pancard_result['message'])
+            else:
+                redacted_doc_coordinates = pancard_result['data']
+                WriteXML(redactedPath, documentName , redacted_doc_coordinates).writexml()
+                """Update upload db"""
+                self.update_upload_filedetails(taskid, "REJECTED", pancard_result['message'])
             
         self.remove_doc_from_workspace(document_path)
 
@@ -87,8 +98,19 @@ class PerformOCRROnDocument:
             """Update upload db"""
             self.update_upload_filedetails(taskid, "REDACTED", e_aadhaar_result['message'])
         else:
-            pass
-
+            """Check the status"""
+            if status == "REJECTED":
+                # Get 75% redacted coordinates of the rejected document
+                rejected_doc_coordinates = RedactRejectedDocument(document_path).rejected()
+                WriteXML(rejectedPath, documentName , rejected_doc_coordinates).writexml()
+                """Update upload db"""
+                self.update_upload_filedetails(taskid, "REJECTED", e_aadhaar_result['message'])
+            else:
+                redacted_doc_coordinates = e_aadhaar_result['data']
+                WriteXML(redactedPath, documentName , redacted_doc_coordinates).writexml()
+                """Update upload db"""
+                self.update_upload_filedetails(taskid, "REJECTED", e_aadhaar_result['message'])
+            
         self.remove_doc_from_workspace(document_path)
       
     def process_aadhaarcard(self, document_path, rejectedPath, redactedPath, documentType, documentName, taskid):
@@ -108,8 +130,19 @@ class PerformOCRROnDocument:
             self.update_upload_filedetails(taskid, "REDACTED", aadhaar_result['message'])
 
         else:
-            pass
-        
+            """Check the status"""
+            if status == "REJECTED":
+                # Get 75% redacted coordinates of the rejected document
+                rejected_doc_coordinates = RedactRejectedDocument(document_path).rejected()
+                WriteXML(rejectedPath, documentName , rejected_doc_coordinates).writexml()
+                """Update upload db"""
+                self.update_upload_filedetails(taskid, "REJECTED", aadhaar_result['message'])
+            else:
+                redacted_doc_coordinates = aadhaar_result['data']
+                WriteXML(redactedPath, documentName , redacted_doc_coordinates).writexml()
+                """Update upload db"""
+                self.update_upload_filedetails(taskid, "REJECTED", aadhaar_result['message'])
+            
         self.remove_doc_from_workspace(document_path)
     
     def process_passport(self, document_path, rejectedPath, redactedPath, documentType, documentName, taskid):
@@ -128,8 +161,18 @@ class PerformOCRROnDocument:
             """Update upload db"""
             self.update_upload_filedetails(taskid, "REDACTED", passport_result['message'])
         else:
-            pass
-        
+            """Check the status"""
+            if status == "REJECTED":
+                # Get 75% redacted coordinates of the rejected document
+                rejected_doc_coordinates = RedactRejectedDocument(document_path).rejected()
+                WriteXML(rejectedPath, documentName , rejected_doc_coordinates).writexml()
+                """Update upload db"""
+                self.update_upload_filedetails(taskid, "REJECTED", passport_result['message'])
+            else:
+                redacted_doc_coordinates = passport_result['data']
+                WriteXML(redactedPath, documentName , redacted_doc_coordinates).writexml()
+                """Update upload db"""
+                self.update_upload_filedetails(taskid, "REJECTED", passport_result['message'])
         self.remove_doc_from_workspace(document_path)
     
     def remove_doc_from_workspace(self, document_path):
@@ -144,7 +187,11 @@ class PerformOCRROnDocument:
             """Update upload db"""
             self.update_upload_filedetails(taskid, "REDACTED", "Not able to Identify Document")
         else:
-            pass
+            # Get 75% redacted coordinates of the rejected document
+            rejected_doc_coordinates = RedactRejectedDocument(document_path).rejected()
+            WriteXML(rejectedPath, documentName , rejected_doc_coordinates).writexml()
+            """Update upload db"""
+            self.update_upload_filedetails(taskid, "REJECTED", "Not able to Identify Document")
 
         self.remove_doc_from_workspace(document_path)
     
@@ -202,6 +249,6 @@ class PerformOCRROnDocument:
         if client_doc:
             WEBHOOK_URL = client_doc["url"]
             HEADER = {'Content-Type': 'application/json'}
-            requests.post(WEBHOOK_URL+"/CVCore/processstatus", data=json.dumps(payload), headers=HEADER)
+            #requests.post(WEBHOOK_URL+"/CVCore/processstatus", data=json.dumps(payload), headers=HEADER)
         else:
             print("ERROR")
