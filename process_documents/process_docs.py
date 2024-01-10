@@ -2,6 +2,7 @@ import magic
 import fitz
 import os
 import cv2
+import shutil
 from PIL import Image
 from ocrr_log_mgmt.ocrr_log import OCRREngineLogging
 from perform_ocrr.perform_ocrr_docs import PerformOCRROnDocument
@@ -25,7 +26,34 @@ class ProcessDocuments:
                 get_doc_format = self.identify_document_format(document_info['path'])
 
                 if get_doc_format == "JPEG":
-                    print("CALLING JPEG")
+                    self.logger.info(f"PDF document found '{document_info['path']}")
+                    document_name_prefix = self.get_prefix_name(document_info['path'])
+                    document_name = os.path.basename(document_info['path'])
+                    renamed_doc_name = f"{document_name_prefix}{document_name}"
+                    jpeg_path = os.path.join(self.workspace_path, renamed_doc_name)
+                    document_info_list = []
+
+                    """Copy document to workspace"""
+                    shutil.copy(document_info['path'], jpeg_path )
+
+                    # Perform Pre-Processing of documents
+                    self.pre_process_docs(jpeg_path, renamed_doc_name)
+
+                    """Perform OCR-Redaction and Prepare Coordinates XML file"""
+                    document_info_list = [
+                        {
+                            "taskId": document_info['taskId'],
+                            "documentType": "JPEG",
+                            "roomName": document_name_prefix.split('+')[0],
+                            "roomID": document_name_prefix.split('+')[1],
+                            "documentName": document_name,
+                            "documentPath": jpeg_path,
+                            "uploadPath": self.upload_path,
+                            "rejectedPath": self.upload_path+"\\"+document_name_prefix.split('+')[0]+"\\"+document_name_prefix.split('+')[1]+"\\"+"Rejected",
+                            "redactedPath": self.upload_path+"\\"+document_name_prefix.split('+')[0]+"\\"+document_name_prefix.split('+')[1]+"\\"+"Redacted"
+                        }
+                    ]
+                    perform_ocrr = PerformOCRROnDocument(document_info_list).ocrr_docs()
 
                 elif get_doc_format == "PDF":
                     """
