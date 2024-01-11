@@ -6,13 +6,14 @@ from helper.clean_text import CleanText
 
 class DocumentTypeIdentification:
     def __init__(self, document_path: str) -> None:
-        self.document_path = document_path
 
+        self.document_path = document_path
+        
         # Tesseract configuration
-        tesseract_config = r'-l eng --oem 3 --psm 6'
+        tesseract_config = r'-l eng --oem 3 --psm 11'
 
         # Extract text from document in dictionary format
-        data_text = pytesseract.image_to_string(self.document_path, output_type=pytesseract.Output.DICT, config=tesseract_config)
+        data_text = pytesseract.image_to_string(document_path, output_type=pytesseract.Output.DICT, config=tesseract_config)
 
         # Clean the extracted text
         clean_text = CleanText(data_text).clean_text()
