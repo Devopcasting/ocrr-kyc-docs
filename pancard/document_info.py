@@ -1,7 +1,8 @@
 import pytesseract
 import re
 import os
-from helper.text_coordinates import TextCoordinates
+#from helper.text_coordinates import TextCoordinates
+from helper.pancard_text_coordinates import TextCoordinates
 from pancard.pattern1 import PanCardPattern1
 from pancard.pattern2 import PanCardPattern2
 from ocrr_log_mgmt.ocrr_log import OCRREngineLogging
@@ -12,11 +13,6 @@ class PancardDocumentInfo:
         log_config = OCRREngineLogging()
         self.logger = log_config.configure_logger()
 
-        # # Set document original path
-        # document_name_list = os.path.basename(document_path).split('+')
-        # original_document_name = document_name_list[2]
-        # self.original_document_path = upload_path+"\\"+document_name_list[0]+"\\"+document_name_list[1]+"\\"+original_document_name
-
         # Get the coordinates of all the extracted text
         self.coordinates = TextCoordinates(document_path).generate_text_coordinates()
         # Get the texts from document
@@ -25,14 +21,14 @@ class PancardDocumentInfo:
      # func: extract the pan card number
     def __extract_pan_card_num(self) -> list:
         matching_line_index = None
-        matching_text = ["Permanent", "Pe@fanent", "Pe@ffignent",
-                          "Pertianent", "Account", "Number", "Card"]
+        matching_text = ["permanent", "pe@fanent", "pe@ffignent",
+                          "pertianent", "account", "number", "card"]
         matching_pan_num_coord = []
         result = []
 
         # find matching text coordinates
         for i,(x1, y1, x2, y2, text) in enumerate(self.coordinates):
-         if text in matching_text:
+         if text.lower() in matching_text:
               matching_line_index = i
               break
         if matching_line_index is None:

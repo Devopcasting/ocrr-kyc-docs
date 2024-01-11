@@ -34,10 +34,10 @@ class PanCardPattern2:
                 break
 
         # remove special characters and white spaces
-        clean_next_line = [i for i in next_line_list if not re.search(r"[\W\d]", i)]
+        clean_next_line = [element for element in next_line_list if re.search(r'[a-zA-Z0-9]', element)]
         if len(clean_next_line) > 1:
             clean_next_line = clean_next_line[:-1]
-
+            
         # get the coordinates
         for i,(x1,y1,x2,y2,text) in enumerate(self.coordinates):
             if text in clean_next_line:
