@@ -78,7 +78,7 @@ class PerformOCRROnDocument:
                 redacted_doc_coordinates = pancard_result['data']
                 WriteXML(redactedPath, documentName , redacted_doc_coordinates).writexml()
                 """Update upload db"""
-                self.update_upload_filedetails(taskid, "REJECTED", pancard_result['message'])
+                self.update_upload_filedetails(taskid, "REDACTED", pancard_result['message'])
             
         self.remove_doc_from_workspace(document_path)
 
@@ -109,7 +109,7 @@ class PerformOCRROnDocument:
                 redacted_doc_coordinates = e_aadhaar_result['data']
                 WriteXML(redactedPath, documentName , redacted_doc_coordinates).writexml()
                 """Update upload db"""
-                self.update_upload_filedetails(taskid, "REJECTED", e_aadhaar_result['message'])
+                self.update_upload_filedetails(taskid, "REDACTED", e_aadhaar_result['message'])
             
         self.remove_doc_from_workspace(document_path)
       
@@ -141,7 +141,7 @@ class PerformOCRROnDocument:
                 redacted_doc_coordinates = aadhaar_result['data']
                 WriteXML(redactedPath, documentName , redacted_doc_coordinates).writexml()
                 """Update upload db"""
-                self.update_upload_filedetails(taskid, "REJECTED", aadhaar_result['message'])
+                self.update_upload_filedetails(taskid, "REDACTED", aadhaar_result['message'])
             
         self.remove_doc_from_workspace(document_path)
     
@@ -172,7 +172,7 @@ class PerformOCRROnDocument:
                 redacted_doc_coordinates = passport_result['data']
                 WriteXML(redactedPath, documentName , redacted_doc_coordinates).writexml()
                 """Update upload db"""
-                self.update_upload_filedetails(taskid, "REJECTED", passport_result['message'])
+                self.update_upload_filedetails(taskid, "REDACTED", passport_result['message'])
         self.remove_doc_from_workspace(document_path)
     
     def remove_doc_from_workspace(self, document_path):
