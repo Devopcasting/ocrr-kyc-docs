@@ -18,16 +18,10 @@ class AadhaarCardFrontInfo:
 
         # Get coordinates and OCR text output
         self.coordinates = TextCoordinates(self.document_path).generate_text_coordinates()
-        #self.coordinates_lang = TextLangCoordinates(self.document_path).generate_text_coordinates()
+        self.coordinates_lang = TextLangCoordinates(self.document_path).generate_text_coordinates()
 
         self.text_eng = pytesseract.image_to_string(self.document_path, config=tesseract_config)
-        #self.text_lang = pytesseract.image_to_string(self.document_path, lang="hin+eng", config=tesseract_config)
-                                                     
-        # Set document original path
-        # document_name_list = os.path.basename(document_path).split('+')
-        # original_document_name = document_name_list[2]
-        # self.original_document_path = upload_path+"\\"+document_name_list[0]+"\\"+document_name_list[1]+"\\"+original_document_name
-
+        self.text_lang = pytesseract.image_to_string(self.document_path, lang="hin+eng", config=tesseract_config)
 
      # func: extract name in english and native language
     def __extract_name(self, index: int) -> list[list[int]]:
@@ -38,14 +32,13 @@ class AadhaarCardFrontInfo:
             Returns:
                 A list of coordinates of the name in English or native language, or an empty list if the name cannot be found.
         """
-        # if index == 1:
-        #     coords = self.coordinates
-        #     text_lang = self.text_eng
-        # else:
-        #     coords = self.coordinates_lang
-        #     text_lang = self.text_lang
-        coords = self.coordinates
-        text_lang = self.text_eng
+        if index == 1:
+            coords = self.coordinates
+            text_lang = self.text_eng
+        else:
+            coords = self.coordinates_lang
+            text_lang = self.text_lang
+        
         name_lang_coords = self.__get_name_lang_coords(coords, text_lang, index)
         return name_lang_coords
 

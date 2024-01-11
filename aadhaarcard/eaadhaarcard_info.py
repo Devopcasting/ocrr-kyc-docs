@@ -27,11 +27,6 @@ class EAadhaarCardInfo:
                        'meghalaya', 'mizoram', 'nagaland', 'odisha', 'puducherry (ut)', 'punjab', 'rajasthan', 
                        'sikkim', 'tamil nadu', 'telangana', 'tripura', 'uttarakhand', 'uttar pradesh']
                                                 
-        # # Set document original path
-        # document_name_list = os.path.basename(document_path).split('+')
-        # original_document_name = document_name_list[2]
-        # self.original_document_path = upload_path+"\\"+document_name_list[0]+"\\"+document_name_list[1]+"\\"+original_document_name
-
      # func: top side native language name
     def __top_native_eng_lang_name(self, index: int) -> list:
 
