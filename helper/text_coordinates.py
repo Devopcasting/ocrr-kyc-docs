@@ -13,7 +13,7 @@ class TextCoordinates:
             data = pytesseract.image_to_data(self.image_path, output_type=pytesseract.Output.DICT)
             special_characters = r'[!@#$%^&*()_\-+{}\[\]:;<>,.?~\\|]'
         else:
-            data = pytesseract.image_to_data(self.image_path, output_type=pytesseract.Output.DICT,config=tesseract_config)
+            data = pytesseract.image_to_data(self.image_path, output_type=pytesseract.Output.DICT)
             special_characters = r'[!@#$%^&*()_\-+{}\[\]:;,.?~\\|]'
     
         coordinates = []
