@@ -18,11 +18,14 @@ class PancardDocumentInfo:
         # Get the texts from document
         self.text = pytesseract.image_to_string(document_path)
 
+        print(self.coordinates)
+        print(self.text)
+        
      # func: extract the pan card number
     def __extract_pan_card_num(self) -> list:
         matching_line_index = None
         matching_text = ["permanent", "pe@fanent", "pe@ffignent",
-                          "pertianent", "account", "number", "card"]
+                          "pertianent", "account", "number", "card", "perenent", "accoun"]
         matching_pan_num_coord = []
         result = []
 
@@ -55,7 +58,7 @@ class PancardDocumentInfo:
     # func: collect the DOB
     def __extract_dob(self) -> list:
         # date pattern DD/MM/YYY
-        date_pattern = r'\d{2}/\d{2}/\d{4}'
+        date_pattern = r'\d{2}/\d{2}/\d{4}|\d{2}-\d{2}-\d{4}'
         text_date_coordinates = []
         dob_coords = []
 
@@ -93,7 +96,7 @@ class PancardDocumentInfo:
     
     # func: collect pancard information
     def collect_pancard_info(self) -> dict:
-        pancard_pattern_keyword_search = ["Name", "Father's", "Father"]
+        pancard_pattern_keyword_search = ["Name", "Father's", "Father", "/EATHER'S", "UINAME"]
         pancard_doc_info_list = []
 
         # Collect : PAN card number
@@ -121,9 +124,9 @@ class PancardDocumentInfo:
         pattern = self.__identify_pancard_pattern(pancard_pattern_keyword_search)
         if pattern == 1:
             # Pan card Pattern 1 found
-            username_p1 = self.__extract_names_pancard_p1(["Name"])
-            fathername_p1 = self.__extract_names_pancard_p1([ "Father's", "Father"])
-            if username_p1 and fathername_p1:
+            username_p1 = self.__extract_names_pancard_p1(["Name", "UINAME"])
+            fathername_p1 = self.__extract_names_pancard_p1([ "Father's", "Father", "/EATHER'S"])
+            if fathername_p1:
                 pancard_doc_info_list.extend(username_p1)
                 pancard_doc_info_list.extend(fathername_p1)
             else:

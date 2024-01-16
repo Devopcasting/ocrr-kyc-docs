@@ -15,6 +15,7 @@ class PanCardPattern1:
         """
         # split the text into lines.
         lines = [i for i in self.text.splitlines() if len(i) != 0]
+    
         # define : matching text coordinates
         matching_text_coords = []
 
@@ -44,8 +45,7 @@ class PanCardPattern1:
             if len(matching_text_coords) == len(next_line_list):
                 return matching_text_coords
 
-    def __find_matching_text_index(self, matching_text: str, coords: list) -> int:
-
+    def __find_matching_text_index(self, matching_text: list, coords: list) -> int:
         # find the line that matches search text in coordinates
         for i, (x1, y1, x2, y2, text) in enumerate(coords):
             if text in matching_text:
@@ -53,7 +53,6 @@ class PanCardPattern1:
         return 0
 
     def __find_matching_line_index(self, lines: list, matching_text: list ) -> int:
-
         # find the line that matches search text
         for i,line in enumerate(lines):
             for k in matching_text:
