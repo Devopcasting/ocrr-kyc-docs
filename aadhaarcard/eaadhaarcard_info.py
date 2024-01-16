@@ -28,22 +28,24 @@ class EAadhaarCardInfo:
                        'sikkim', 'tamil nadu', 'telangana', 'tripura', 'uttarakhand', 'uttar pradesh']
                                                 
      # func: top side native language name
-    def __top_native_eng_lang_name(self, index: int) -> list:
+    def top_native_eng_lang_name(self, index: int) -> list:
 
         result = []
 
         # clean text list
         clean_text = [i for i in self.text_lang.split("\n") if len(i) != 0]
+        print(clean_text)
         # get matching text below
-        matching_text = self.__below_matching_text(clean_text, index)
+        matching_text = self.below_matching_text(clean_text, index)
+        print(matching_text)
         if not matching_text:
             return result
         
-        result = self.__get_top_native_name_coords(matching_text, self.coordinates_lang)
+        result = self.get_top_native_name_coords(matching_text, self.coordinates_lang)
         return result
     
     # func: find text below matching text
-    def __below_matching_text(self, clean_text: list, index: int) -> list:
+    def below_matching_text(self, clean_text: list, index: int) -> list:
         # find text below matching text
         matching_text = []
         for i,text in enumerate(clean_text):
@@ -53,7 +55,7 @@ class EAadhaarCardInfo:
         return matching_text
     
     # func: get top native name coordinates
-    def __get_top_native_name_coords(self, matching_text: list, coords) -> list:
+    def get_top_native_name_coords(self, matching_text: list, coords) -> list:
         result = []
          
         if len(matching_text) > 1:
@@ -65,7 +67,56 @@ class EAadhaarCardInfo:
             # if len(matching_text) == len(result):
             #     break
         return result
+    
+    # func: get user name in english
+    def get_username_in_eng(self):
+        result = []
+        # clean text list
+        clean_text = [i for i in self.text_eng.split("\n") if len(i) != 0]
+        print(clean_text)
+        # get matching text below
+        matching_text = []
+        for i,text in enumerate(clean_text):
+            if "dob" in text.lower() or "birth" in text.lower() or "bith" in text.lower() or "year" in text.lower() or "binh" in text.lower():
+                matching_text = clean_text[i - 1].split()
+                break
+        if not matching_text:
+            return result
         
+        if len(matching_text) > 1:
+            matching_text = matching_text[:-1]
+        
+        for i, (x1, y1, x2, y2, text) in enumerate(self.coordinates):
+            if text in matching_text:
+                result.append([x1, y1, x2, y2])
+        return result
+
+    # func: get user name in regional lang
+    def get_username_in_regional_lang(self):
+        result = []
+
+        # clean text list
+        clean_text = [i for i in self.text_lang.split("\n") if len(i) != 0]
+
+        # get matching text below
+        matching_text = []
+        for i,text in enumerate(clean_text):
+            if "dob" in text.lower() or "birth" in text.lower() or "bith" in text.lower():
+                matching_text = clean_text[i - 2].split()
+                break
+        if not matching_text:
+            return result
+        
+        if len(matching_text) > 1:
+            matching_text = matching_text[:-1]
+        
+        for i, (x1, y1, x2, y2, text) in enumerate(self.coordinates_lang):
+            if text in matching_text:
+                result.append([x1, y1, x2, y2])
+        return result
+        
+
+
     # func: extract dob
     def __extract_dob(self) -> list:
         dob_coordinates = []
@@ -190,19 +241,33 @@ class EAadhaarCardInfo:
     def collect_eaadhaarcard_info(self):
         eaadhaarcard_info_list = []
 
-        # Collect: Top side name in native language
-        top_side_native_lang_name = self.__top_native_eng_lang_name(1)
-        if not top_side_native_lang_name:
-            self.logger.error(f"| Document Rejected with error ERREAAD4")
-            return {"message": "E-Aadhaar Error: extracting name in native language", "status": "REJECTED"}
-        eaadhaarcard_info_list.extend(top_side_native_lang_name)
+        # Collect: User name in regional language
+        user_name_in_regional = self.get_username_in_regional_lang()
+        if not user_name_in_regional:
+            self.logger.error("| E-Aadhaar Error: User name in regional language")
+            return {"message": "E-Aadhaar Error: User name in regional language", "status": "REJECTED"}
+        eaadhaarcard_info_list.extend(user_name_in_regional)
+        
+        # Collect: User name in english
+        user_name_in_english = self.get_username_in_eng()
+        if not user_name_in_english:
+            self.logger.error("| E-Aadhaar Error: User name in english language")
+            return {"message": "E-Aadhaar Error: User name in english language", "status": "REJECTED"}
+        eaadhaarcard_info_list.extend(user_name_in_english)
+
+        # # Collect: Top side name in native language
+        # top_side_native_lang_name = self.__top_native_eng_lang_name(1)
+        # if not top_side_native_lang_name:
+        #     self.logger.error(f"| Document Rejected with error ERREAAD4")
+        #     return {"message": "E-Aadhaar Error: extracting name in native language", "status": "REJECTED"}
+        # eaadhaarcard_info_list.extend(top_side_native_lang_name)
 
         # Collect: Top side name in english language
-        top_side_eng_lang_name = self.__top_native_eng_lang_name(2)
-        if not top_side_eng_lang_name:
-            self.logger.error(f"| Document Rejected with error ERREAAD3")
-            return {"message": "E-Aadhaar Error: extracting name in english", "status": "REJECTED"}
-        eaadhaarcard_info_list.extend(top_side_eng_lang_name)
+        # top_side_eng_lang_name = self.top_native_eng_lang_name(2)
+        # if not top_side_eng_lang_name:
+        #     self.logger.error(f"| Document Rejected with error ERREAAD3")
+        #     return {"message": "E-Aadhaar Error: extracting name in english", "status": "REJECTED"}
+        # eaadhaarcard_info_list.extend(top_side_eng_lang_name)
         
         # Collect: DOB
         aadhaar_card_dob = self.__extract_dob()
@@ -219,7 +284,7 @@ class EAadhaarCardInfo:
         # Collect: E-Aadhaar card number
         e_aadhaar_card_num = self.__extract_eaadharcard_number("Aadhaar")
         if not e_aadhaar_card_num:
-            self.logger.error(f"| Document Rejected with error ERREAAD1: {self.original_document_path}")
+            self.logger.error(f"| Document Rejected with error ERREAAD1")
             return {"message": "E-Aadhaar Error: extracting card number", "status": "REJECTED"}
         eaadhaarcard_info_list.extend(e_aadhaar_card_num)
 
